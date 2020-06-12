@@ -47,7 +47,6 @@ public class Bank implements LoginWindowDelegate, TerminalTransactionsDelegate {
 			Date eventDate = new Date(2,3,5);
 			long num = 12345;
 			Timestamp eventTime = new Timestamp(num);
-
 			dbHandler.insertEvent(new Event(213123,"abc", eventDate,eventTime,"www.","description",1));
 		} else {
 			loginWindow.handleLoginFailed();

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import ca.ubc.cs304.model.BranchModel;
 import ca.ubc.cs304.model.Event;
+import ca.ubc.cs304.model.Location;
 
 /**
  * This class handles all database related transactions
@@ -220,6 +221,43 @@ public class DatabaseConnectionHandler {
 			System.out.println(EXCEPTION_TAG + " " + e.getMessage());
 			rollbackConnection();
 		}
+	}
+
+	public Location[] getLocationInfo(){
+		ArrayList<Location> result = new ArrayList<>();
+		try {
+			Statement stmt = connection.createStatement();
+			ResultSet rs = stmt.executeQuery("SELECT * FROM Location");
+
+			// get info on ResultSet
+			ResultSetMetaData rsmd = rs.getMetaData();
+
+			System.out.println(" ");
+
+			// display column names;
+			for (int i = 0; i < rsmd.getColumnCount(); i++) {
+				// get column name and print it
+				System.out.printf("%-15s", rsmd.getColumnName(i + 1));
+			}
+
+			//Integer locationID, String locationName, String unit, Integer houseNum, String street, Integer cityID
+			while(rs.next()) {
+				Location model = new Location(rs.getInt("eventID"),
+						rs.getString("locationName"),
+						rs.getString("unit"),
+						rs.getInt("houseNum"),
+						rs.getString("street"),
+						rs.getInt("cityID"));
+				result.add(model);
+			}
+
+			rs.close();
+			stmt.close();
+		} catch (SQLException e) {
+			System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+		}
+
+		return result.toArray(new Location[result.size()]);
 	}
 
 	public Event[] getEventInfo() {
