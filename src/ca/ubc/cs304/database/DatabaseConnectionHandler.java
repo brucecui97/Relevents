@@ -1,14 +1,10 @@
 package ca.ubc.cs304.database;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 
 import ca.ubc.cs304.model.BranchModel;
+import ca.ubc.cs304.model.Event;
 
 /**
  * This class handles all database related transactions
@@ -200,6 +196,106 @@ public class DatabaseConnectionHandler {
 			stmt.close();
 		} catch (SQLException e) {
 			System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+		}
+	}
+
+	// group 22 code
+
+	public void insertEvent(Event model) {
+		try {
+			PreparedStatement ps = connection.prepareStatement("INSERT INTO Event VALUES (?,?,?,?,?,?,?)");
+			ps.setInt(1, model.getEventID());
+			ps.setString(2, model.getEventName());
+			ps.setDate(3, model.getEventDate());
+			ps.setTimestamp(4, model.getEventTime());
+			ps.setString(5, model.getWebsite());
+			ps.setString(6, model.getDescription());
+			ps.setInt(7, model.getGoverningID());
+
+			ps.executeUpdate();
+			connection.commit();
+
+			ps.close();
+		} catch (SQLException e) {
+			System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+			rollbackConnection();
+		}
+	}
+
+	public Event[] getEventInfo() {
+		ArrayList<Event> result = new ArrayList<>();
+
+		try {
+			Statement stmt = connection.createStatement();
+			ResultSet rs = stmt.executeQuery("SELECT * FROM Event");
+
+			// get info on ResultSet
+			ResultSetMetaData rsmd = rs.getMetaData();
+
+			System.out.println(" ");
+
+			// display column names;
+			for (int i = 0; i < rsmd.getColumnCount(); i++) {
+				// get column name and print it
+				System.out.printf("%-15s", rsmd.getColumnName(i + 1));
+			}
+
+			while(rs.next()) {
+				Event model = new Event(rs.getInt("eventID"),
+						rs.getString("eventName"),
+						rs.getDate("eventDate"),
+						rs.getTimestamp("eventTime"),
+						rs.getString("website"),
+						rs.getString("description"),
+						rs.getInt("governingID"));
+				result.add(model);
+			}
+
+			rs.close();
+			stmt.close();
+		} catch (SQLException e) {
+			System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+		}
+
+		return result.toArray(new Event[result.size()]);
+	}
+
+	public void updateEvent(int id, String name) {
+		try {
+			PreparedStatement ps = connection.prepareStatement("UPDATE Event SET eventName = ? WHERE eventID = ?");
+			ps.setString(1, name);
+			ps.setInt(2, id);
+
+			int rowCount = ps.executeUpdate();
+			if (rowCount == 0) {
+				System.out.println(WARNING_TAG + " Event " + id + " does not exist!");
+			}
+
+			connection.commit();
+
+			ps.close();
+		} catch (SQLException e) {
+			System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+			rollbackConnection();
+		}
+	}
+
+	public void deleteEvent(int eventID) {
+		try {
+			PreparedStatement ps = connection.prepareStatement("DELETE FROM Event WHERE eventID = ?");
+			ps.setInt(1, eventID);
+
+			int rowCount = ps.executeUpdate();
+			if (rowCount == 0) {
+				System.out.println(WARNING_TAG + " Event " + eventID + " does not exist!");
+			}
+
+			connection.commit();
+
+			ps.close();
+		} catch (SQLException e) {
+			System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+			rollbackConnection();
 		}
 	}
 }

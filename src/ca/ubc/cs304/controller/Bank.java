@@ -4,8 +4,12 @@ import ca.ubc.cs304.database.DatabaseConnectionHandler;
 import ca.ubc.cs304.delegates.LoginWindowDelegate;
 import ca.ubc.cs304.delegates.TerminalTransactionsDelegate;
 import ca.ubc.cs304.model.BranchModel;
+import ca.ubc.cs304.model.Event;
 import ca.ubc.cs304.ui.LoginWindow;
 import ca.ubc.cs304.ui.TerminalTransactions;
+
+import java.sql.Date;
+import java.sql.Timestamp;
 
 /**
  * This is the main controller class that will orchestrate everything.
@@ -36,9 +40,15 @@ public class Bank implements LoginWindowDelegate, TerminalTransactionsDelegate {
 			loginWindow.dispose();
 
 			// switch the lines below to whatever we want to do in terms of UI
-			TerminalTransactions transaction = new TerminalTransactions();
-			transaction.setupDatabase(this);
-			transaction.showMainMenu(this);
+//			TerminalTransactions transaction = new TerminalTransactions();
+//			transaction.setupDatabase(this);
+//			transaction.showMainMenu(this);
+
+			Date eventDate = new Date(2,3,5);
+			long num = 12345;
+			Timestamp eventTime = new Timestamp(num);
+
+			dbHandler.insertEvent(new Event(213123,"abc", eventDate,eventTime,"www.","description",1));
 		} else {
 			loginWindow.handleLoginFailed();
 
