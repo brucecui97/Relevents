@@ -35,6 +35,7 @@ public class Bank implements LoginWindowDelegate, TerminalTransactionsDelegate {
 			// Once connected, remove login window and start text transaction flow
 			loginWindow.dispose();
 
+			// switch the lines below to whatever we want to do in terms of UI
 			TerminalTransactions transaction = new TerminalTransactions();
 			transaction.setupDatabase(this);
 			transaction.showMainMenu(this);
